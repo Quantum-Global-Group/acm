@@ -46,18 +46,39 @@ class MarketplaceIntegration:
     def setup_agents(self, num_consumers: int = 2, num_providers: int = 3,
                      initial_balance: float = 5.0) -> None:
         print(f"[integration] Setting up {num_consumers} consumers, {num_providers} providers")
+
+        # Use pinned real wallet addresses when env vars are set, so live
+        # settlement targets an on-chain funded escrow rather than random addrs.
+        pinned_consumer = settings.consumer_wallet_address or ""
+        pinned_provider = settings.provider_wallet_address or ""
+
+        # Guard: contract rejects same address for consumer and provider.
+        if pinned_consumer and pinned_provider and pinned_consumer.lower() == pinned_provider.lower():
+            print(
+                "[integration] WARNING: CONSUMER_WALLET_ADDRESS == PROVIDER_WALLET_ADDRESS; "
+                "live settlement will reject. Using random address for provider."
+            )
+            pinned_provider = ""
+
         for i in range(num_consumers):
+            addr = pinned_consumer if (i == 0 and pinned_consumer) else _rand_addr()
             self.manager.add_consumer(
                 agent_id=f"consumer-{i + 1}",
-                wallet_address=_rand_addr(),
+                wallet_address=addr,
                 initial_balance=initial_balance,
             )
+            if i == 0 and pinned_consumer:
+                print(f"[integration] consumer-1 pinned to {pinned_consumer}")
+
         for i in range(num_providers):
+            addr = pinned_provider if (i == 0 and pinned_provider) else _rand_addr()
             self.manager.add_provider(
                 agent_id=f"provider-{i + 1}",
-                wallet_address=_rand_addr(),
+                wallet_address=addr,
                 supported_tasks=["image_classification", "data_processing"],
             )
+            if i == 0 and pinned_provider:
+                print(f"[integration] provider-1 pinned to {pinned_provider}")
 
     async def run_marketplace(self, transactions: int = 50, units: int = 100) -> None:
         await self.manager.marketplace_simulation(

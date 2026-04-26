@@ -27,6 +27,23 @@ async def test_health(client):
 
 
 @pytest.mark.asyncio
+async def test_public_meta_exposes_only_safe_fields(client):
+    r = await client.get("/api/public-meta")
+    assert r.status_code == 200
+    body = r.json()
+    expected_keys = {
+        "api_version",
+        "arc_chain_id",
+        "arc_contract_address",
+        "arc_explorer_url",
+        "usdc_address",
+    }
+    assert set(body.keys()) == expected_keys
+    forbidden = {"private_key", "circle_api_key", "PRIVATE_KEY", "CIRCLE_API_KEY"}
+    assert not (set(body.keys()) & forbidden)
+
+
+@pytest.mark.asyncio
 async def test_compute_requires_x402(client):
     r = await client.post("/api/compute", json={
         "task_id": "no-pay",

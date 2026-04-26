@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
 import secrets
 from dataclasses import dataclass, asdict
@@ -22,6 +23,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from backend.config import settings
+
+log = logging.getLogger(__name__)
 
 
 def _utcnow() -> datetime:
@@ -90,6 +93,7 @@ class SettlementEngine:
         provider_address: str,
         amount_usdc: float,
         task_id: str,
+        quantity: int = 1,
     ) -> str:
         await asyncio.sleep(0.005)
         return "0x" + secrets.token_hex(32)
@@ -100,16 +104,34 @@ class SettlementEngine:
         provider_address: str,
         amount_usdc: float,
         task_id: str,
+        quantity: int = 1,
     ) -> str:
         from web3 import Web3
         self._ensure_web3()
         loop = asyncio.get_event_loop()
 
-        # Encode price into 6-decimal USDC units (consumer pays unit_price * quantity).
-        # We pass quantity=1, unit_price=amount_in_usdc_units to keep settlement granular.
-        unit_price_units = int(round(amount_usdc * 1_000_000))
-        if unit_price_units <= 0:
-            raise ValueError(f"amount_usdc {amount_usdc} below 1 unit (10^-6 USDC)")
+        # Distribute total cost across quantity units so each unit_price stays
+        # within the contract's max_unit_price ceiling (10 000 micro = $0.01).
+        q = max(1, quantity)
+        total_micro = int(round(amount_usdc * 1_000_000))
+        if total_micro <= 0:
+            raise ValueError(f"amount_usdc {amount_usdc} rounds to 0 micro-USDC")
+
+        unit_price_micro = total_micro // q
+        remainder = total_micro - unit_price_micro * q
+        # Absorb the remainder by rounding up on the last unit only; we always
+        # send a single pay_for_compute call so quantity * unit_price must equal
+        # total_micro exactly.  Add remainder to unit_price and reduce quantity
+        # by 1 if needed, or just bump unit_price and accept ±1 micro drift.
+        unit_price_micro = (total_micro + q - 1) // q  # ceiling division
+
+        MAX_UNIT_PRICE_MICRO = 10_000  # mirrors contract max_unit_price
+        if unit_price_micro > MAX_UNIT_PRICE_MICRO:
+            raise ValueError(
+                f"unit_price_micro {unit_price_micro} exceeds contract ceiling "
+                f"{MAX_UNIT_PRICE_MICRO} ({MAX_UNIT_PRICE_MICRO / 1_000_000:.4f} USDC). "
+                "Reduce estimated_units or lower pricing knobs."
+            )
 
         def _send() -> str:
             assert self._w3 is not None and self._contract is not None and self._account is not None
@@ -117,8 +139,8 @@ class SettlementEngine:
             fn = self._contract.functions.pay_for_compute(
                 Web3.to_checksum_address(consumer_address),
                 Web3.to_checksum_address(provider_address),
-                1,
-                unit_price_units,
+                q,
+                unit_price_micro,
                 task_id,
             )
             tx = fn.build_transaction({
@@ -144,6 +166,7 @@ class SettlementEngine:
         provider_address: str,
         amount_usdc: float,
         task_id: str,
+        quantity: int = 1,
     ) -> Optional[str]:
         if amount_usdc <= 0:
             return None
@@ -155,12 +178,20 @@ class SettlementEngine:
 
         try:
             if live:
-                tx_hash = await self._live(consumer_address, provider_address, amount_usdc, task_id)
+                tx_hash = await self._live(
+                    consumer_address, provider_address, amount_usdc, task_id, quantity
+                )
                 status = "confirmed"
             else:
-                tx_hash = await self._simulate(consumer_address, provider_address, amount_usdc, task_id)
+                tx_hash = await self._simulate(
+                    consumer_address, provider_address, amount_usdc, task_id, quantity
+                )
                 status = "pending"
         except Exception as exc:
+            log.error(
+                "[settlement] %s settlement failed for task=%s consumer=%s provider=%s: %s",
+                mode, task_id, consumer_address, provider_address, exc, exc_info=True,
+            )
             self.records.append(SettlementRecord(
                 consumer_address=consumer_address,
                 provider_address=provider_address,

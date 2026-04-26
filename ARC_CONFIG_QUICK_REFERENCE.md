@@ -18,7 +18,7 @@ USDC_ADDRESS=0x...         # USDC token on Arc testnet
 ### Optional (Highly Recommended)
 
 ```bash
-ARC_CHAIN_ID=11155111      # Arc testnet chain ID
+ARC_CHAIN_ID=5042002       # Official Arc testnet chain ID (eth_chainId: 0x4cef52)
 ARC_EXPLORER_URL=...       # Arc block explorer
 ```
 
@@ -43,22 +43,29 @@ Private Key: 0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd
 
 ### 2️⃣ Get ARC_RPC_URL (2 minutes)
 
-**Primary Arc Testnet RPC:**
+**Primary Arc testnet RPC (official docs — “Connect to network”):**
 ```
-https://arc-testnet-rpc.io
+https://rpc.testnet.arc.network
 ```
+
+**WebSocket (official):** `wss://rpc.testnet.arc.network`
+
+**Provider-backed alternatives** (same chain):  
+`https://rpc.blockdaemon.testnet.arc.network` · `https://rpc.drpc.testnet.arc.network` · `https://rpc.quicknode.testnet.arc.network` · `https://arc-testnet.drpc.org` · `https://5042002.rpc.thirdweb.com`
 
 **Verify it works:**
 ```bash
-curl -X POST https://arc-testnet-rpc.io \
+curl -X POST https://rpc.testnet.arc.network \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}'
 ```
 
 **Should return:**
 ```json
-{"jsonrpc":"2.0","result":"0x2b6bee1","id":1}
+{"jsonrpc":"2.0","result":"0x4cef52","id":1}
 ```
+
+(`0x4cef52` = **5042002** — official Arc testnet chain ID.)
 
 If you see that response → **RPC is working!** ✅
 
@@ -95,21 +102,21 @@ If you get a result → **Address is valid!** ✅
 
 ### 4️⃣ Get ARC_CHAIN_ID (1 minute)
 
-**Standard Arc testnet chain ID:**
+**Official Arc testnet chain ID:**
 ```
-11155111
+5042002
 ```
 
 **Verify with curl:**
 ```bash
-curl -X POST https://arc-testnet-rpc.io \
+curl -X POST https://rpc.testnet.arc.network \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}'
 ```
 
 **Look for response:**
 ```
-0x2b6bee1  (this is 11155111 in hex)
+0x4cef52  (this is 5042002 in hex)
 ```
 
 ### 5️⃣ Get ARC_EXPLORER_URL (1 minute)
@@ -131,8 +138,8 @@ Once you have all values, create `.env` in your project root:
 
 ```bash
 # Arc Network Configuration
-ARC_RPC_URL=https://arc-testnet-rpc.io
-ARC_CHAIN_ID=11155111
+ARC_RPC_URL=https://rpc.testnet.arc.network
+ARC_CHAIN_ID=5042002
 USDC_ADDRESS=0x...   # From Arc docs
 PRIVATE_KEY=0x...    # From generation above
 ARC_EXPLORER_URL=https://testnet.arc.io
@@ -160,10 +167,10 @@ echo ".env" >> .gitignore
 Before building, fund your wallet with testnet USDC:
 
 1. **Get your wallet address** (from PRIVATE_KEY generation)
-2. **Visit Circle Faucet:** https://testnet.circle.com/faucet
-3. **Enter your wallet address**
-4. **Request testnet USDC** (usually 100 USDC)
-5. **Wait 1-2 minutes** for confirmation
+2. **Use Circle’s faucets** — see [How-to: Fund a Testnet Wallet](https://developers.circle.com/wallets/fund-a-testnet-wallet) (Public Faucet at [faucet.circle.com](https://faucet.circle.com) or Developer Console Faucet)
+3. **Enter your wallet address** (or wallet ID for console faucet)
+4. **Request testnet USDC** for the Arc testnet network your wallet uses
+5. **Wait for confirmation** per faucet instructions
 6. **Verify in explorer:** https://testnet.arc.io/address/YOUR_ADDRESS
 
 ---
@@ -176,7 +183,7 @@ Complete this before starting GETTING_STARTED.md:
 - [ ] PRIVATE_KEY generated (starts with 0x)
 - [ ] ARC_RPC_URL verified (curl test passed)
 - [ ] USDC_ADDRESS confirmed from docs
-- [ ] ARC_CHAIN_ID confirmed (11155111)
+- [ ] ARC_CHAIN_ID confirmed (5042002)
 - [ ] ARC_EXPLORER_URL noted (https://testnet.arc.io)
 
 ### Wallet Ready

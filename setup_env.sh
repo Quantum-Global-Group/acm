@@ -163,22 +163,32 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "The RPC URL is the endpoint to connect to Arc testnet."
 echo ""
-echo "Options:"
-echo "  1. Primary Arc RPC (recommended): https://arc-testnet-rpc.io"
-echo "  2. Alternative RPC: https://rpc.arc-testnet.io"
-echo "  3. Custom RPC URL"
+echo "Options (official Arc testnet — chain ID 5042002):"
+echo "  1. Primary RPC (official): https://rpc.testnet.arc.network"
+echo "  2. Blockdaemon: https://rpc.blockdaemon.testnet.arc.network"
+echo "  3. dRPC (Arc): https://rpc.drpc.testnet.arc.network"
+echo "  4. QuickNode: https://rpc.quicknode.testnet.arc.network"
+echo "  5. Custom RPC URL (paste full URL)"
+echo ""
+echo "Fund wallet: https://developers.circle.com/wallets/fund-a-testnet-wallet"
 echo ""
 
-read -p "Select option (1-3) or paste URL: " rpc_choice
+read -p "Select option (1-5) or paste URL: " rpc_choice
 
 case $rpc_choice in
     1)
-        ARC_RPC_URL="https://arc-testnet-rpc.io"
+        ARC_RPC_URL="https://rpc.testnet.arc.network"
         ;;
     2)
-        ARC_RPC_URL="https://rpc.arc-testnet.io"
+        ARC_RPC_URL="https://rpc.blockdaemon.testnet.arc.network"
         ;;
-    3|*)
+    3)
+        ARC_RPC_URL="https://rpc.drpc.testnet.arc.network"
+        ;;
+    4)
+        ARC_RPC_URL="https://rpc.quicknode.testnet.arc.network"
+        ;;
+    5|*)
         read -p "Enter custom RPC URL: " ARC_RPC_URL
         ;;
 esac
@@ -203,11 +213,11 @@ echo -e "${BLUE}STEP 2: Arc Chain ID${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo "The chain ID identifies the Arc testnet."
-echo "Standard value: 11155111"
+echo "Official Arc testnet chain ID: 5042002 (eth_chainId: 0x4cef52)"
 echo ""
 
-read -p "Enter chain ID (default: 11155111): " ARC_CHAIN_ID
-ARC_CHAIN_ID=${ARC_CHAIN_ID:-11155111}
+read -p "Enter chain ID (default: 5042002): " ARC_CHAIN_ID
+ARC_CHAIN_ID=${ARC_CHAIN_ID:-5042002}
 
 set_env_var "ARC_CHAIN_ID" "$ARC_CHAIN_ID"
 

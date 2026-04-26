@@ -20,7 +20,7 @@ class Colors:
     CYAN = '\033[96m'
 
 # Arc testnet chain ID
-ARC_TESTNET_CHAIN_ID = 11155111
+ARC_TESTNET_CHAIN_ID = 5042002
 
 # Known USDC addresses to test
 KNOWN_USDC_ADDRESSES = [

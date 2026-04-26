@@ -33,7 +33,7 @@ Building per-action agent-to-agent payments was conceptually clean but operation
 - EVM compatibility meant we could use `web3.py` and `eth-account` unchanged; our `scripts/deploy_contract.py` is a stock pattern.
 
 **Friction**
-- The testnet RPC endpoints in our starter kit (`https://arc-testnet-rpc.io`, `https://rpc.arc-testnet.io`, `https://testnet-rpc.arc.io`) all returned connection errors. The `arc_auto_discover.py` falls back to manual entry, but a hackathon participant probably doesn't know that the canonical URL lives in the Arc Discord rather than in `docs.arc.io`.
+- Earlier starter-kit placeholders (`arc-testnet-rpc.io`, etc.) did not resolve; the repo now defaults to the official endpoint `https://rpc.testnet.arc.network` (chain ID **5042002**, `eth_chainId` `0x4cef52`) plus provider-backed alternates from Arc docs. USDC on Arc still must be pasted from Arc/Circle docs — auto-discovery patterns are Sepolia-era and rarely match Arc.
 - Faucet rate limits and minimum balances are not consistent across docs vs. portal. We had to guess that the funding step would actually credit USDC (and not native gas).
 - The "USDC is the gas token" framing is great for the pitch but unclear for the deploy step — does my contract deployment debit USDC for gas? At what rate?
 

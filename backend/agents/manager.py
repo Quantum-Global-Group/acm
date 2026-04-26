@@ -11,7 +11,8 @@ from typing import Any, Dict, List, Optional
 
 from backend.agents.consumer import ConsumerAgent
 from backend.agents.provider import ProviderAgent
-from backend.models import ComputeTaskType
+from backend.engines.registry import provider_registry
+from backend.models import ComputeTaskType, ProviderRegistration
 
 
 @dataclass
@@ -51,18 +52,42 @@ class AgentManager:
         wallet_address: str,
         supported_tasks: Optional[List[str]] = None,
         unit_price: float = 0.0001,
+        pricing: Optional[Dict[str, float]] = None,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        register: bool = True,
     ) -> ProviderAgent:
         if supported_tasks is None:
             tasks = list(ComputeTaskType)
         else:
             tasks = [ComputeTaskType(t) for t in supported_tasks]
+
+        pricing_map: Dict[ComputeTaskType, float] = {}
+        if pricing:
+            pricing_map = {ComputeTaskType(k): float(v) for k, v in pricing.items()}
+
         agent = ProviderAgent(
             agent_id=agent_id,
             wallet_address=wallet_address,
             supported_tasks=tasks,
             unit_price=unit_price,
+            pricing=pricing_map,
+            name=name,
+            description=description,
         )
         self.providers[agent_id] = agent
+
+        if register:
+            provider_registry.register(ProviderRegistration(
+                agent_id=agent_id,
+                wallet_address=wallet_address,
+                supported_tasks=tasks,
+                pricing=pricing_map,
+                default_unit_price=unit_price,
+                name=name,
+                description=description,
+            ))
+
         return agent
 
     async def close(self) -> None:
@@ -96,8 +121,9 @@ class AgentManager:
                 provider.credit(float(result.get("actual_cost_usdc") or 0.0), units_per_transaction)
                 self.stats.interaction_count += 1
 
-        # Bounded concurrency to be friendly to the backend.
-        sem = asyncio.Semaphore(8)
+        # Serialize when driving live settlement: all txs are signed with the same
+        # backend PRIVATE_KEY, so parallel sends race on nonce / gas price.
+        sem = asyncio.Semaphore(1)
 
         async def _bounded(i: int) -> None:
             async with sem:

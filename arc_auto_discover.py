@@ -35,11 +35,15 @@ class ArcConfig:
             'ARC_EXPLORER_URL': self.explorer_url,
         }
 
-# Known Arc RPC endpoints
+# Known Arc testnet RPC endpoints (official + provider-backed + aggregators)
+# Primary + alts: Arc developer docs "Connect to network" / public RPC.
 KNOWN_RPC_ENDPOINTS = [
-    "https://arc-testnet-rpc.io",
-    "https://rpc.arc-testnet.io",
-    "https://testnet-rpc.arc.io",
+    "https://rpc.testnet.arc.network",
+    "https://rpc.blockdaemon.testnet.arc.network",
+    "https://rpc.drpc.testnet.arc.network",
+    "https://rpc.quicknode.testnet.arc.network",
+    "https://arc-testnet.drpc.org",
+    "https://5042002.rpc.thirdweb.com",
 ]
 
 # Known USDC addresses to test (common patterns)
@@ -50,8 +54,8 @@ USDC_ADDRESS_PATTERNS = [
     "0xb19c8395d2bdf7f1506b0a51a50919d5109b5860",  # Another variant
 ]
 
-# Arc testnet standard chain ID
-ARC_TESTNET_CHAIN_ID = 11155111
+# Arc testnet chain ID (official; eth_chainId returns 0x4cef52)
+ARC_TESTNET_CHAIN_ID = 5042002
 
 # USDC contract ABI (minimal - just decimals function)
 USDC_ABI_PARTIAL = [

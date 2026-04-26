@@ -42,7 +42,35 @@ python backend.py
 # Try: curl http://localhost:8000/health
 ```
 
-### 4. Integration Checklist
+### 4. Run the Stakeholder UI (Next.js)
+
+The `web/` directory hosts a Next.js (App Router) frontend that proxies the
+FastAPI marketplace from its server runtime, so secrets stay on the host.
+
+```bash
+# Terminal 1 — FastAPI backend
+source venv/bin/activate
+uvicorn backend.main:app --reload          # http://127.0.0.1:8000
+
+# Terminal 2 — Next.js UI
+cd web
+cp .env.example .env.local                  # adjust BACKEND_URL / NEXT_PUBLIC_* as needed
+npm install                                 # first time only
+npm run dev                                 # http://127.0.0.1:3000
+```
+
+Pages:
+
+- `/` — product overview
+- `/compute` — submit a compute request and see the on-chain settlement
+- `/status` — live readout of `/health`, `/api/metrics`, and chain metadata
+- `/funding` — operator-facing explainer for the consumer escrow flow
+
+The browser only ever talks to the Next server. The Next server forwards calls
+to FastAPI and injects the demo `X-402-Payment` header — the browser never sees
+keys, the relayer wallet, or the x402 token.
+
+### 5. Integration Checklist
 
 - [ ] Circle Developer Account created (same email as hackathon registration)
 - [ ] Arc testnet account funded with USDC via faucet

@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     token_multiplier: float = 0.000001
 
     # Operational
-    settlement_simulate: bool = Field(default=True, alias="SETTLEMENT_SIMULATE")
+    settlement_simulate: bool = Field(default=False, alias="SETTLEMENT_SIMULATE")
 
 
 settings = Settings()

@@ -106,11 +106,11 @@ DO NOT SKIP THE ARC CONFIGURATION STEP!
 
 Required:
   PRIVATE_KEY=0x...
-  ARC_RPC_URL=https://arc-testnet-rpc.io
+  ARC_RPC_URL=https://rpc.testnet.arc.network
   USDC_ADDRESS=0x...
 
 Optional but recommended:
-  ARC_CHAIN_ID=11155111
+  ARC_CHAIN_ID=5042002
   ARC_EXPLORER_URL=https://testnet.arc.io
 
 ================================================================================

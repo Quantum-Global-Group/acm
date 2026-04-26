@@ -31,6 +31,7 @@ htmlcov/
 *.log
 logs/
 backend.log
+artifacts/
 
 # Smart contracts compiled artifacts
 bytecode/
@@ -45,6 +46,9 @@ Thumbs.db
 # Zip / Zone files
 files.zip
 *.Zone.Identifier
+*:Zone.Identifier
 
 # Local plan/cursor caches
 .cursor/
+.claude/
+.firecrawl/

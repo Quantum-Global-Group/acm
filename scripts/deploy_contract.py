@@ -37,8 +37,14 @@ def main() -> int:
     usdc_address = os.getenv("USDC_ADDRESS")
     chain_id = int(os.getenv("ARC_CHAIN_ID", "0") or 0)
 
-    if not all([rpc_url, private_key, usdc_address]):
-        print("ERROR: Missing ARC_RPC_URL, PRIVATE_KEY, or USDC_ADDRESS in .env")
+    missing = [n for n, v in (
+        ("ARC_RPC_URL", rpc_url),
+        ("PRIVATE_KEY", private_key),
+        ("USDC_ADDRESS", usdc_address),
+    ) if not (v and str(v).strip())]
+    if missing:
+        print("ERROR: Missing or empty in .env: " + ", ".join(missing))
+        print(f"       Loaded from: {ENV_FILE}")
         return 1
 
     if usdc_address.lower() == "0x" + "0" * 40:

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: acm-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SETTLEMENT_SIMULATE
+        value: "true"
+      - key: ARC_RPC_URL
+        value: https://rpc.testnet.arc.network
+      - key: ARC_CHAIN_ID
+        value: "5042002"
+      - key: ARC_EXPLORER_URL
+        value: https://testnet.arc.io
+      - key: ARC_CONTRACT_ADDRESS
+        value: "0x0000000000000000000000000000000000000000"
+      - key: USDC_ADDRESS
+        value: "0x3600000000000000000000000000000000000000"

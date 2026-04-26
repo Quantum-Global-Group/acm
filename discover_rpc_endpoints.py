@@ -36,19 +36,21 @@ class RPCEndpoint:
         status = f"{Colors.GREEN}✓{Colors.RESET}" if self.is_working else f"{Colors.RED}✗{Colors.RESET}"
         return f"{status} {self.url} ({self.latency_ms:.0f}ms) Chain {self.chain_id} Block {self.block_number}"
 
-# Known RPC endpoints to test
+# Known RPC endpoints to test (official Arc testnet + provider-backed + aggregators)
 ENDPOINTS_TO_TEST = [
-    ("https://arc-testnet-rpc.io", "Arc Official"),
-    ("https://rpc.arc-testnet.io", "Arc Alt"),
-    ("https://testnet-rpc.arc.io", "Arc Testnet"),
-    ("https://arc.testnet.rpc.io", "Arc Testnet Alt"),
+    ("https://rpc.testnet.arc.network", "Arc primary (official)"),
+    ("https://rpc.blockdaemon.testnet.arc.network", "Blockdaemon"),
+    ("https://rpc.drpc.testnet.arc.network", "dRPC (Arc)"),
+    ("https://rpc.quicknode.testnet.arc.network", "QuickNode"),
+    ("https://arc-testnet.drpc.org", "dRPC public"),
+    ("https://5042002.rpc.thirdweb.com", "thirdweb"),
 ]
 
-# Additional endpoints that might work
+# Legacy / deprecated placeholders (kept for diagnostics only)
 ADDITIONAL_ENDPOINTS = [
-    "https://rpc-testnet.arc.io",
-    "https://testnet.arc-rpc.io",
-    "https://api-testnet.arc.io",
+    "https://arc-testnet-rpc.io",
+    "https://rpc.arc-testnet.io",
+    "https://testnet-rpc.arc.io",
 ]
 
 ################################################################################
