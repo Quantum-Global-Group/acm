@@ -42,8 +42,8 @@ Render cannot see local untracked files.
 web
 ```
 
-Use the **Next.js** framework preset. If Vercel shows an **Output Directory**
-field, leave it blank or set it to `.next`; do not set it to `public`.
+Use the **Next.js** framework preset. Leave **Output Directory** blank; do not
+set it to `public` or `.next`.
 
 3. Add these environment variables:
 
