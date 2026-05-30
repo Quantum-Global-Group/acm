@@ -323,10 +323,13 @@ async def debug_reset() -> Dict[str, Any]:
 
 
 def run() -> None:
+    import os
+    # Allow preview system's PORT env var to override configured port
+    port = int(os.getenv("PORT", settings.api_port))
     uvicorn.run(
         "backend.main:app",
         host=settings.api_host,
-        port=settings.api_port,
+        port=port,
         log_level=settings.log_level.lower(),
     )
 
